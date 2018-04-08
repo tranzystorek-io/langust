@@ -1,9 +1,3 @@
-cache:
-    paths:
-        - .sconsign.dblite
-        - build/release/
-        - build/release/test/
-
 build_program:
     image: tranzystorek/buildenv
     stage: build
