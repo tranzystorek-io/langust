@@ -1,0 +1,8 @@
+# langust project root gitignore
+
+# scons files
+.sconsign.dblite
+
+# project dirs
+build/
+bin/
