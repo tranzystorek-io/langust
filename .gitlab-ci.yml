@@ -1,5 +1,6 @@
 cache:
     paths:
+        - .sconsign.dblite
         - build/release/
         - build/release/test/
 
