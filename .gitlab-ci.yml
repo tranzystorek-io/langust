@@ -6,9 +6,13 @@ build_program:
     artifacts:
         paths:
             - bin/release/prog
+    only:
+        - master
 
 test_program:
     image: tranzystorek/buildenv
     stage: test
     script:
         - scons test
+    only:
+        - master
