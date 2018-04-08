@@ -50,15 +50,16 @@ for key in sorted(envs.keys()):
                           exports={'env': testenv}, duplicate=0)
         Depends(test, prog)
 
+        builds['test'] = test;
+
     builds[key] = prog
 
 if 'release' in builds:
-    test_alias = Alias('test', [test], test[0].abspath)
-    #Depends(test_alias, test)
+    target = builds['release']
+    test_target = builds['test']
+
+    test_alias = Alias('test', [test_target], test_target[0].abspath)
     AlwaysBuild(test_alias)
 
-    run_alias = Alias('run', [prog], prog[0].abspath)
-    #Depends(run_alias, prog)
+    run_alias = Alias('run', target, target[0].abspath)
     AlwaysBuild(run_alias)
-else:
-    pass
