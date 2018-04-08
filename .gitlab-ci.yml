@@ -1,0 +1,14 @@
+build_program:
+    image: tranzystorek/buildenv
+    stage: build
+    script:
+        - scons --rel
+    artifacts:
+        paths:
+            - bin/release/prog
+
+test_program:
+    image: tranzystorek/buildenv
+    stage: test
+    script:
+        - scons test
