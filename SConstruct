@@ -41,7 +41,7 @@ for key in sorted(envs.keys()):
     prog = SConscript('src/SConscript', variant_dir=env['variant_dir'],
                       exports={'env': env}, duplicate=0)
 
-    if key == 'release':
+    if key == 'debug':
         testenv = env.Clone()
         #testenv['variant_dir'] += '/test'
         testenv['target_dir'] += '/test'
@@ -56,10 +56,17 @@ for key in sorted(envs.keys()):
 
 if 'release' in builds:
     target = builds['release']
+
+    Default(target)
+
+    run_alias = Alias('run', [target], target[0].abspath)
+    AlwaysBuild(run_alias)
+
+if 'debug' in builds:
+    target = builds['debug']
     test_target = builds['test']
 
     test_alias = Alias('test', [test_target], test_target[0].abspath)
     AlwaysBuild(test_alias)
 
-    run_alias = Alias('run', target, target[0].abspath)
-    AlwaysBuild(run_alias)
+    Default(builds['debug'])

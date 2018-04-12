@@ -198,7 +198,7 @@ $ f.(l);
 
 		<eq expr> = <rel expr>, [<eq op>, <rel expr>] ;
 
-		<not expr> = `!', <not expr> | <eq expr> ;
+		<not expr> = [`!'], <eq expr> ;
 
 		<and expr> = <not expr>, \{`&&', <not expr>\} ;
 

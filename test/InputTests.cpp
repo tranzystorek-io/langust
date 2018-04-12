@@ -1,7 +1,19 @@
+#include <sstream>
+
 #include "Input.hpp"
 #include "catch.hpp"
 
-TEST_CASE( "first test", "[input]" )
+TEST_CASE( "input is read", "[input]" )
 {
-  REQUIRE( 2 + 2 == 4 );
+  std::istringstream iss("abc");
+  langust::parse::Input input(iss);
+
+  REQUIRE( input.getNextChar() == 'a' );
+
+  REQUIRE( input.getNextChar() == 'b' );
+
+  REQUIRE( input.getNextChar() == 'c' );
+
+  //input.getNextChar();
+  //REQUIRE( input.currentChar() == '' );
 }
