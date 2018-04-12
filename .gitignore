@@ -1,5 +1,8 @@
 # langust project root gitignore
 
+# doxygen output
+docs/doxy
+
 # scons files
 .sconsign.dblite
 

@@ -38,7 +38,7 @@ struct Token {
     bool b;
   } value;
 
-  Token(Type type, std::string s = "")
+  Token(Type type, const std::string& s = "")
     : type(type), str(s)
   {}
 

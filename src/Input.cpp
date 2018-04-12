@@ -5,6 +5,8 @@ using namespace langust::parse;
 Input::Input(std::istream& in)
   : in_(in),
     current_('\0') {
+  //set the input stream not to skip whitespaces
+  in_ >> std::noskipws;
 }
 
 char Input::currentChar() const {

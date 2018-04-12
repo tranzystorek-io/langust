@@ -265,11 +265,35 @@ TEST_CASE( "tokens are scanned", "[lexer]" ) {
   } // invalid symbols
 }
 
-TEST_CASE( "exception is thrown when identifier too long", "[lexer][!throws]" ) {
+TEST_CASE( "exception is thrown when identifier too long", "[lexer]" ) {
   std::string s(MAX_IDENTIFIER_LENGTH + 1, 'a');
   std::istringstream iss(s);
 
   Lexer lexer(iss);
 
   REQUIRE_THROWS( lexer.getToken() );
+}
+
+TEST_CASE( "file position is tracked", "[lexer]" ) {
+  std::istringstream iss("ab 12\n"
+                         "ef >:");
+
+  Lexer lexer(iss);
+  Token t = Token::Unknown();
+
+  t = lexer.getToken();
+  REQUIRE( t.pos.line == 1 );
+  REQUIRE( t.pos.col == 0 );
+
+  t = lexer.getToken();
+  REQUIRE( t.pos.line == 1 );
+  REQUIRE( t.pos.col == 3 );
+
+  t = lexer.getToken();
+  REQUIRE( t.pos.line == 2 );
+  REQUIRE( t.pos.col == 0 );
+
+  t = lexer.getToken();
+  REQUIRE( t.pos.line == 2 );
+  REQUIRE( t.pos.col == 3 );
 }
