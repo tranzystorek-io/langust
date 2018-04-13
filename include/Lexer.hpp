@@ -20,9 +20,7 @@ private:
   std::string buffer_;
   char lastch_;
 
-  //int lineptr_;
-  int line_;
-  int col_;
+  Position pos_;
 
   Token current_tok_;
 

@@ -6,6 +6,16 @@
 namespace langust {
 namespace parse {
 
+struct Position {
+  Position(int l = 0, int c = 0)
+    : line(l),
+      col(c)
+  {}
+
+  int line;
+  int col;
+};
+
 struct Token {
   enum class Type {
     INT, IDN, BLN,
@@ -28,10 +38,7 @@ struct Token {
 
   std::string str;
 
-  struct {
-    int line;
-    int col;
-  } pos;
+  Position pos;
 
   union {
     int i;
@@ -39,8 +46,13 @@ struct Token {
   } value;
 
   Token(Type type, const std::string& s = "")
-    : type(type), str(s)
+    : type(type),
+      str(s)
   {}
+
+  void setPos(Position p) {
+    pos = p;
+  }
 
   void setPos(int line, int col) {
     pos.line = line;

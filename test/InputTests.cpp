@@ -13,7 +13,4 @@ TEST_CASE( "input is read", "[input]" )
   REQUIRE( input.getNextChar() == 'b' );
 
   REQUIRE( input.getNextChar() == 'c' );
-
-  //input.getNextChar();
-  //REQUIRE( input.currentChar() == '' );
 }
