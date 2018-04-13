@@ -9,8 +9,8 @@ namespace parse {
 struct Position {
   Position(int l = 0, int c = 0)
     : line(l),
-      col(c)
-  {}
+      col(c) {
+  }
 
   int line;
   int col;
@@ -47,8 +47,8 @@ struct Token {
 
   Token(Type type, const std::string& s = "")
     : type(type),
-      str(s)
-  {}
+      str(s) {
+  }
 
   void setPos(Position p) {
     pos = p;
