@@ -58,6 +58,10 @@ Token Lexer::getToken() {
   return current_tok_ = ret;
 }
 
+Token Lexer::currentToken() const {
+  return current_tok_;
+}
+
 void Lexer::ignoreWhiteSpace() {
   while(std::isspace(lastch_))
     processNextChar();
@@ -73,7 +77,7 @@ Token Lexer::tryIdentifier() {
     while(std::isalnum(lastch_) || lastch_ == '_') {
       cacheNextChar();
 
-      if(++length > MAX_IDENTIFIER_LENGTH) {
+      if(++length > LANGUST_MAX_IDENTIFIER_LENGTH) {
         throw std::runtime_error("Maximum identifier length exceeded");
       }
     }
@@ -83,18 +87,11 @@ Token Lexer::tryIdentifier() {
     return ret;
   }
 
-  if( (ret = tryBoolean()) ) {
+  if( (ret = tryKeyword()) ) {
     return ret;
   }
 
-  if( (ret = tryFunc()) ) {
-    return ret;
-  }
-
-  if( (ret = tryReturn()) ) {
-    return ret;
-  }
-
+  //identifier
   ret.type = Type::IDN;
   ret.str = buffer_;
 
@@ -347,6 +344,24 @@ Token Lexer::tryOther() {
 
     ret.type = Type::SCL;
     ret.str = buffer_;
+  }
+
+  return ret;
+}
+
+Token Lexer::tryKeyword() {
+  Token ret = Token::Unknown();
+
+  if( (ret = tryBoolean()) ) {
+    return ret;
+  }
+
+  if( (ret = tryFunc()) ) {
+    return ret;
+  }
+
+  if( (ret = tryReturn()) ) {
+    return ret;
   }
 
   return ret;

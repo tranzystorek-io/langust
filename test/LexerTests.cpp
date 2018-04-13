@@ -266,7 +266,7 @@ TEST_CASE( "tokens are scanned", "[lexer]" ) {
 }
 
 TEST_CASE( "exception is thrown when identifier too long", "[lexer]" ) {
-  std::string s(MAX_IDENTIFIER_LENGTH + 1, 'a');
+  std::string s(LANGUST_MAX_IDENTIFIER_LENGTH + 1, 'a');
   std::istringstream iss(s);
 
   Lexer lexer(iss);

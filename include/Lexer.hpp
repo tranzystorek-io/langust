@@ -4,7 +4,9 @@
 #include "Input.hpp"
 #include "Token.hpp"
 
-#define MAX_IDENTIFIER_LENGTH 64
+#ifndef LANGUST_MAX_IDENTIFIER_LENGTH
+#define LANGUST_MAX_IDENTIFIER_LENGTH 64
+#endif // LANGUST_MAX_IDENTIFIER_LENGTH
 
 namespace langust {
 namespace parse {
@@ -14,14 +16,15 @@ public:
   Lexer(std::istream& in = std::cin);
 
   Token getToken();
+  Token currentToken() const;
 
 private:
   Input input_;
-  std::string buffer_;
+
   char lastch_;
+  std::string buffer_;
 
   Position pos_;
-
   Token current_tok_;
 
 private:
@@ -32,6 +35,7 @@ private:
   Token tryOperator();
   Token tryOther();
 
+  Token tryKeyword();
   Token tryBoolean();
   Token tryFunc();
   Token tryReturn();
