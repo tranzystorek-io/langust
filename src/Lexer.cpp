@@ -59,18 +59,18 @@ Token Lexer::getToken() {
 }
 
 void Lexer::ignoreWhiteSpace() {
-  while(isspace(lastch_))
+  while(std::isspace(lastch_))
     processNextChar();
 }
 
 Token Lexer::tryIdentifier() {
   Token ret = Token::Unknown();
 
-  if(isalpha(lastch_) || lastch_ == '_') {
+  if(std::isalpha(lastch_) || lastch_ == '_') {
     int length = 1;
     cacheNextChar();
 
-    while(isalnum(lastch_) || lastch_ == '_') {
+    while(std::isalnum(lastch_) || lastch_ == '_') {
       cacheNextChar();
 
       if(++length > MAX_IDENTIFIER_LENGTH) {
@@ -114,10 +114,10 @@ Token Lexer::tryInteger() {
   else if(lastch_ == '-') {
     char test = input_.peekNextChar();
 
-    if(test != '0' && isdigit(test)) {
+    if(test != '0' && std::isdigit(test)) {
       cacheNextChar();
 
-      while(isdigit(lastch_)) {
+      while(std::isdigit(lastch_)) {
         cacheNextChar();
       }
 
@@ -129,10 +129,10 @@ Token Lexer::tryInteger() {
       //TODO error?
     }
   }
-  else if(isdigit(lastch_)) {
+  else if(std::isdigit(lastch_)) {
     cacheNextChar();
 
-    while(isdigit(lastch_)) {
+    while(std::isdigit(lastch_)) {
       cacheNextChar();
     }
 
