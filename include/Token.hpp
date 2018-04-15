@@ -16,6 +16,32 @@ struct Position {
   int col;
 };
 
+enum PipeOpType {
+  FLT,
+  MAP
+};
+
+enum MulOpType {
+  MUL,
+  DIV,
+  MOD
+};
+
+enum AddOpType {
+  ADD,
+  SUB
+};
+
+enum RelOpType {
+  LT, LE,
+  GT, GE
+};
+
+enum EqOpType {
+  EQU,
+  NEQ
+};
+
 struct Token {
   enum class Type {
     INT, IDN, BLN,
@@ -24,14 +50,13 @@ struct Token {
     RND_OP, RND_CL,
     SQR_OP, SQR_CL,
     SCL, COL, DOT, CMM,
+    PIPE_OP,
+    MUL_OP,
+    ADD_OP,
+    REL_OP,
+    EQ_OP,
     NOT, AND, OR,
-    EQU, NEQ,
-    FLT, MAP,
     ASN,
-    MUL, DIV, MOD,
-    ADD, SUB,
-    LT, LE,
-    GT, GE,
     END_OF_SEQ,
     UNKNOWN
   } type;
@@ -43,6 +68,12 @@ struct Token {
   union {
     int i;
     bool b;
+
+    PipeOpType pipe_t;
+    MulOpType mul_t;
+    AddOpType add_t;
+    RelOpType rel_t;
+    EqOpType eq_t;
   } value;
 
   Token(Type type, const std::string& s = "")

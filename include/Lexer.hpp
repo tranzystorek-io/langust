@@ -32,7 +32,14 @@ private:
 
   Token tryIdentifier();
   Token tryInteger();
+
   Token tryOperator();
+  Token tryRelOpOrPipeOp();
+  Token tryMulOp();
+  Token tryAddOp();
+  Token tryEqOp();
+  Token tryLogicalOp();
+
   Token tryOther();
 
   Token tryKeyword();

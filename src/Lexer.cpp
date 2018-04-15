@@ -144,45 +144,143 @@ Token Lexer::tryInteger() {
 Token Lexer::tryOperator() {
   Token ret = Token::Unknown();
 
-  if(lastch_ == '+') {
-    cacheNextChar();
+  if( (ret = tryRelOpOrPipeOp()) )
+    ;
+  else if( (ret = tryMulOp()) )
+    ;
+  else if( (ret = tryAddOp()) )
+    ;
+  else if( (ret = tryEqOp()) )
+    ;
+  else if( (ret = tryLogicalOp()) )
+    ;
 
-    ret.type = Type::ADD;
-    ret.str = buffer_;
-  }
-  else if(lastch_ == '-') {
-    cacheNextChar();
+  return ret;
+}
 
-    ret.type = Type::SUB;
-    ret.str = buffer_;
-  }
-  else if(lastch_ == '*') {
-    cacheNextChar();
+Token Lexer::tryRelOpOrPipeOp() {
+  Token ret = Token::Unknown();
 
-    ret.type = Type::MUL;
-    ret.str = buffer_;
-  }
-  else if(lastch_ == '/') {
-    cacheNextChar();
-
-    ret.type = Type::DIV;
-    ret.str = buffer_;
-  }
-  else if(lastch_ == '%') {
-    cacheNextChar();
-
-    ret.type = Type::MOD;
-    ret.str = buffer_;
-  }
-  else if(lastch_ == '!') {
+  if(lastch_ == '<') {
     char test = input_.peekNextChar();
 
     if(test == '=') {
       cacheNextChar();
       cacheNextChar();
 
-      ret.type = Type::NEQ;
+      ret.type = Type::REL_OP;
       ret.str = buffer_;
+      ret.value.rel_t = RelOpType::LE;
+    }
+    else {
+      cacheNextChar();
+
+      ret.type = Type::REL_OP;
+      ret.str = buffer_;
+      ret.value.rel_t = RelOpType::LT;
+    }
+  }
+  else if(lastch_ == '>') {
+    char test = input_.peekNextChar();
+
+    if(test == '=') {
+      cacheNextChar();
+      cacheNextChar();
+
+      ret.type = Type::REL_OP;
+      ret.str = buffer_;
+      ret.value.rel_t = RelOpType::GE;
+    }
+    else if(test == '?') {
+      cacheNextChar();
+      cacheNextChar();
+
+      ret.type = Type::PIPE_OP;
+      ret.str = buffer_;
+      ret.value.pipe_t = PipeOpType::FLT;
+    }
+    else if(test == ':') {
+      cacheNextChar();
+      cacheNextChar();
+
+      ret.type = Type::PIPE_OP;
+      ret.str = buffer_;
+      ret.value.pipe_t = PipeOpType::MAP;
+    }
+    else {
+      cacheNextChar();
+
+      ret.type = Type::REL_OP;
+      ret.str = buffer_;
+      ret.value.rel_t = RelOpType::GT;
+    }
+  }
+
+  return ret;
+}
+
+Token Lexer::tryMulOp() {
+  Token ret = Token::Unknown();
+
+  if(lastch_ == '*') {
+    cacheNextChar();
+
+    ret.type = Type::MUL_OP;
+    ret.str = buffer_;
+    ret.value.mul_t = MulOpType::MUL;
+  }
+  else if(lastch_ == '/') {
+    cacheNextChar();
+
+    ret.type = Type::MUL_OP;
+    ret.str = buffer_;
+    ret.value.mul_t = MulOpType::DIV;
+  }
+  else if(lastch_ == '%') {
+    cacheNextChar();
+
+    ret.type = Type::MUL_OP;
+    ret.str = buffer_;
+    ret.value.mul_t = MulOpType::MOD;
+  }
+
+  return ret;
+}
+
+Token Lexer::tryAddOp() {
+  Token ret = Token::Unknown();
+
+  if(lastch_ == '+') {
+    cacheNextChar();
+
+    ret.type = Type::ADD_OP;
+    ret.str = buffer_;
+    ret.value.add_t = AddOpType::ADD;
+  }
+  else if(lastch_ == '-') {
+    cacheNextChar();
+
+    ret.type = Type::ADD_OP;
+    ret.str = buffer_;
+    ret.value.add_t = AddOpType::SUB;
+  }
+
+  return ret;
+}
+
+Token Lexer::tryEqOp() {
+  Token ret = Token::Unknown();
+
+  if(lastch_ == '!') {
+    char test = input_.peekNextChar();
+
+    if(test == '=') {
+      cacheNextChar();
+      cacheNextChar();
+
+      ret.type = Type::EQ_OP;
+      ret.str = buffer_;
+      ret.value.eq_t = EqOpType::NEQ;
     }
     else {
       cacheNextChar();
@@ -198,8 +296,9 @@ Token Lexer::tryOperator() {
       cacheNextChar();
       cacheNextChar();
 
-      ret.type = Type::EQU;
+      ret.type = Type::EQ_OP;
       ret.str = buffer_;
+      ret.value.eq_t = EqOpType::EQU;
     }
     else {
       cacheNextChar();
@@ -208,55 +307,14 @@ Token Lexer::tryOperator() {
       ret.str = buffer_;
     }
   }
-  else if(lastch_ == '<') {
-    char test = input_.peekNextChar();
 
-    if(test == '=') {
-      cacheNextChar();
-      cacheNextChar();
+  return ret;
+}
 
-      ret.type = Type::LE;
-      ret.str = buffer_;
-    }
-    else {
-      cacheNextChar();
+Token Lexer::tryLogicalOp() {
+  Token ret = Token::Unknown();
 
-      ret.type = Type::LT;
-      ret.str = buffer_;
-    }
-  }
-  else if(lastch_ == '>') {
-    char test = input_.peekNextChar();
-
-    if(test == '=') {
-      cacheNextChar();
-      cacheNextChar();
-
-      ret.type = Type::GE;
-      ret.str = buffer_;
-    }
-    else if(test == '?') {
-      cacheNextChar();
-      cacheNextChar();
-
-      ret.type = Type::FLT;
-      ret.str = buffer_;
-    }
-    else if(test == ':') {
-      cacheNextChar();
-      cacheNextChar();
-
-      ret.type = Type::MAP;
-      ret.str = buffer_;
-    }
-    else {
-      cacheNextChar();
-
-      ret.type = Type::GT;
-      ret.str = buffer_;
-    }
-  }
-  else if(lastch_ == '&') {
+  if(lastch_ == '&') {
     char test = input_.peekNextChar();
 
     if(test == '&') {

@@ -61,7 +61,7 @@ TEST_CASE( "tokens are scanned", "[lexer]" ) {
     iss.str("-0 -1");
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::SUB );
+    REQUIRE( t.type == TokType::ADD_OP );
 
     t = lexer.getToken();
     REQUIRE( t.type == TokType::INT );
@@ -100,28 +100,34 @@ TEST_CASE( "tokens are scanned", "[lexer]" ) {
     iss.str("> >= >? >: < <= && || = == ! != + - * / %");
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::GT );
+    REQUIRE( t.type == TokType::REL_OP );
     REQUIRE( t.str == ">" );
+    REQUIRE( t.value.rel_t == RelOpType::GT );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::GE );
+    REQUIRE( t.type == TokType::REL_OP );
     REQUIRE( t.str == ">=" );
+    REQUIRE( t.value.rel_t == RelOpType::GE );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::FLT );
+    REQUIRE( t.type == TokType::PIPE_OP );
     REQUIRE( t.str == ">?" );
+    REQUIRE( t.value.pipe_t == PipeOpType::FLT );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::MAP );
+    REQUIRE( t.type == TokType::PIPE_OP );
     REQUIRE( t.str == ">:" );
+    REQUIRE( t.value.pipe_t == PipeOpType::MAP );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::LT );
+    REQUIRE( t.type == TokType::REL_OP );
     REQUIRE( t.str == "<" );
+    REQUIRE( t.value.rel_t == RelOpType::LT );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::LE );
+    REQUIRE( t.type == TokType::REL_OP );
     REQUIRE( t.str == "<=" );
+    REQUIRE( t.value.rel_t == RelOpType::LE );
 
     t = lexer.getToken();
     REQUIRE( t.type == TokType::AND );
@@ -136,36 +142,43 @@ TEST_CASE( "tokens are scanned", "[lexer]" ) {
     REQUIRE( t.str == "=" );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::EQU );
+    REQUIRE( t.type == TokType::EQ_OP );
     REQUIRE( t.str == "==" );
+    REQUIRE( t.value.eq_t == EqOpType::EQU );
 
     t = lexer.getToken();
     REQUIRE( t.type == TokType::NOT );
     REQUIRE( t.str == "!" );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::NEQ );
+    REQUIRE( t.type == TokType::EQ_OP );
     REQUIRE( t.str == "!=" );
+    REQUIRE( t.value.eq_t == EqOpType::NEQ );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::ADD );
+    REQUIRE( t.type == TokType::ADD_OP );
     REQUIRE( t.str == "+" );
+    REQUIRE( t.value.add_t == AddOpType::ADD );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::SUB );
+    REQUIRE( t.type == TokType::ADD_OP );
     REQUIRE( t.str == "-" );
+    REQUIRE( t.value.add_t == AddOpType::SUB );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::MUL );
+    REQUIRE( t.type == TokType::MUL_OP );
     REQUIRE( t.str == "*" );
+    REQUIRE( t.value.mul_t == MulOpType::MUL );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::DIV );
+    REQUIRE( t.type == TokType::MUL_OP );
     REQUIRE( t.str == "/" );
+    REQUIRE( t.value.mul_t == MulOpType::DIV );
 
     t = lexer.getToken();
-    REQUIRE( t.type == TokType::MOD );
+    REQUIRE( t.type == TokType::MUL_OP );
     REQUIRE( t.str == "%" );
+    REQUIRE( t.value.mul_t == MulOpType::MOD );
   } // operators
 
   SECTION( "other" ) {
