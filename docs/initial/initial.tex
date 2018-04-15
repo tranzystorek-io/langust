@@ -107,18 +107,18 @@ $ l[:2];
 \end{lstlisting}
 \begin{lstlisting}[frame=tb, title={Operacje \textit{map} i \textit{filter}}]
 $ l = [0, 1, 2, 3];
-$ l >: (func(el) {return el+1;});
+$ l >: func(el) {return el+1;};
 [1, 2, 3, 4]
-$ l >? (func(el) {return el < 2;});
+$ l >? func(el) {return el < 2;};
 [0, 1]
 \end{lstlisting}
 \begin{lstlisting}[frame=tb, title={Obiekty funkcyjne}]
 $ f = func(list) {
->  return list >: (func(l) {
->                            return l >? (func(el) {return el > 2;})
->                                     >: (func(el) {return el + 1;});
->                          });
-> }
+>  return list >: func(l) {
+>                           return l >? func(el) {return el > 2;}
+>                                    >: func(el) {return el + 1;};
+>                         };
+> };
 $ l = [[1, 2], [3, 4]];
 $ f.(l);
 [[], [4, 5]]
@@ -131,13 +131,9 @@ $ f.(l);
 	\renewcommand{\syntright}{}
 
 	\begin{grammar}
-		<statement> = <assign stmt> | <expr stmt> ;
+		<statement> = <expr>, `;' ;
 
 		<statement list> = <statement>, \{<statement>\} ;
-
-		<assign stmt> = <identifier>, `=', (<expr> | <func literal>), `;' ;
-
-		<expr stmt> = <expr>, `;' ;
 
 		<return stmt> = `return', <expr>, `;' ;
 
@@ -183,11 +179,11 @@ $ f.(l);
 		<arglist> = <expr>, \{`,', <expr>\} ;
 
 		<atom> = <integer> | <boolean> | <list literal>
-				 | <func apply> | <identifier> | `(', <expr>, `)' ;
+				 | <func apply> | <func literal> | <identifier> | `(', <expr>, `)' ;
 	\end{grammar}
 	\begin{grammar}
 		<list expr> = <atom>, \{<pipe op>,
-					  `(', (<identifier> | <func literal>), `)'
+					  (<identifier> | <func literal>)
 					  | `[', <list index>, `]'\} ;
 
 		<mul expr> = <list expr>, \{<mul op>, <list expr>\} ;
@@ -202,7 +198,9 @@ $ f.(l);
 
 		<and expr> = <not expr>, \{`&&', <not expr>\} ;
 
-		<expr> = <and expr>, \{`||', <and expr>\} ;
+		<or expr> = <and expr>, \{`||', <and expr>\} ;
+
+		<expr> = <or expr>, [`=', <or expr>] ;
 	\end{grammar}
 
 \end{document}
