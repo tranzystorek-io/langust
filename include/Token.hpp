@@ -81,7 +81,7 @@ struct Token {
       str(s) {
   }
 
-  void setPos(Position p) {
+  void setPos(const Position& p) {
     pos = p;
   }
 
@@ -90,7 +90,7 @@ struct Token {
     pos.col = col;
   }
 
-  operator bool() {
+  operator bool() const {
     return type != Type::UNKNOWN;
   }
 
