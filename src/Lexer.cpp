@@ -39,13 +39,13 @@ Token Lexer::getToken() {
   ignoreWhiteSpace();
   Position pos = pos_;
 
-  if( (ret = tryIdentifier()) )
+  if( (ret = tryIdentifier()).isValid() )
     ;
-  else if( (ret = tryInteger()) )
+  else if( (ret = tryInteger()).isValid() )
     ;
-  else if( (ret = tryOperator()) )
+  else if( (ret = tryOperator()).isValid() )
     ;
-  else if( (ret = tryOther()) )
+  else if( (ret = tryOther()).isValid() )
     ;
   else {
     //invalid symbol
@@ -87,7 +87,7 @@ Token Lexer::tryIdentifier() {
     return ret;
   }
 
-  if( (ret = tryKeyword()) ) {
+  if( (ret = tryKeyword()).isValid() ) {
     return ret;
   }
 
@@ -144,15 +144,15 @@ Token Lexer::tryInteger() {
 Token Lexer::tryOperator() {
   Token ret = Token::Unknown();
 
-  if( (ret = tryRelOpOrPipeOp()) )
+  if( (ret = tryRelOpOrPipeOp()).isValid() )
     ;
-  else if( (ret = tryMulOp()) )
+  else if( (ret = tryMulOp()).isValid() )
     ;
-  else if( (ret = tryAddOp()) )
+  else if( (ret = tryAddOp()).isValid() )
     ;
-  else if( (ret = tryEqOp()) )
+  else if( (ret = tryEqOp()).isValid() )
     ;
-  else if( (ret = tryLogicalOp()) )
+  else if( (ret = tryLogicalOp()).isValid() )
     ;
 
   return ret;
@@ -410,15 +410,15 @@ Token Lexer::tryOther() {
 Token Lexer::tryKeyword() {
   Token ret = Token::Unknown();
 
-  if( (ret = tryBoolean()) ) {
+  if( (ret = tryBoolean()).isValid() ) {
     return ret;
   }
 
-  if( (ret = tryFunc()) ) {
+  if( (ret = tryFunc()).isValid() ) {
     return ret;
   }
 
-  if( (ret = tryReturn()) ) {
+  if( (ret = tryReturn()).isValid() ) {
     return ret;
   }
 

@@ -90,6 +90,10 @@ struct Token {
     pos.col = col;
   }
 
+  bool isValid() const {
+    return type != Type::UNKNOWN;
+  }
+
   operator bool() const {
     return type != Type::UNKNOWN;
   }
