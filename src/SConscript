@@ -1,7 +1,8 @@
 # langust project source build script
 Import('env')
 
-sources = ['Input.cpp', 'Lexer.cpp']
+sources = ['Input.cpp', 'Lexer.cpp', 'ParserTable.cpp',
+           'ProductionTable.cpp']
 #objects = env.Object(sources)
 
 target = env.Program(target=env['target_dir'] + '/prog', source=['main.cpp'] + sources)
