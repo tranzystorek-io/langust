@@ -38,7 +38,7 @@ ParserTable::TokenList ParserTable::getTokensForSymbol(SymbolId id) const {
 void ParserTable::initTable() {
   using TokType = Token::Type;
 
-  Symbol s;
+  Symbol s; s.type = Symbol::Type::OK;
   Row r;
 
   //STMT
@@ -316,7 +316,7 @@ void ParserTable::initTable() {
   r.emplace(TokType::COL, s);
   r.emplace(TokType::SCL, s);
   r.emplace(TokType::CMM, s);
-  r.emplace(TokType::RND_OP, s);
+  r.emplace(TokType::RND_CL, s);
   r.emplace(TokType::SQR_OP, s);
   r.emplace(TokType::SQR_CL, s);
 
