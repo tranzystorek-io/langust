@@ -418,7 +418,7 @@ TEST_CASE( "exception is thrown when identifier too long", "[lexer]" ) {
 
   Lexer lexer(iss);
 
-  REQUIRE_THROWS( lexer.getToken() );
+  REQUIRE_THROWS_AS( lexer.getToken(), std::runtime_error );
 }
 
 TEST_CASE( "exception is thrown when integer too long", "[lexer]" ) {
@@ -427,7 +427,7 @@ TEST_CASE( "exception is thrown when integer too long", "[lexer]" ) {
 
   Lexer lexer(iss);
 
-  REQUIRE_THROWS( lexer.getToken() );
+  REQUIRE_THROWS_AS( lexer.getToken(), std::runtime_error );
 }
 
 TEST_CASE( "file position is tracked", "[lexer]" ) {
