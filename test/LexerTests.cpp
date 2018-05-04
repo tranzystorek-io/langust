@@ -421,6 +421,15 @@ TEST_CASE( "exception is thrown when identifier too long", "[lexer]" ) {
   REQUIRE_THROWS( lexer.getToken() );
 }
 
+TEST_CASE( "exception is thrown when integer too long", "[lexer]" ) {
+  std::string s(LANGUST_MAX_INTEGER_LENGTH + 1, '1');
+  std::istringstream iss(s);
+
+  Lexer lexer(iss);
+
+  REQUIRE_THROWS( lexer.getToken() );
+}
+
 TEST_CASE( "file position is tracked", "[lexer]" ) {
   std::istringstream iss("ab 12\n"
                          "ef >:");
