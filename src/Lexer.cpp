@@ -1,7 +1,6 @@
 #include "Lexer.hpp"
 
 #include <cctype>
-#include <cstdlib>
 
 #include <stdexcept>
 
@@ -112,30 +111,40 @@ Token Lexer::tryInteger() {
     char test = input_.peekNextChar();
 
     if(test != '0' && std::isdigit(test)) {
+      int length = 1;
       cacheNextChar();
 
       while(std::isdigit(lastch_)) {
         cacheNextChar();
+
+        if(++length > LANGUST_MAX_INTEGER_LENGTH) {
+          throw std::runtime_error("Maximum integer length exceeded");
+        }
       }
 
       ret.type = Type::INT;
       ret.str = buffer_;
-      ret.value.i = atoi(buffer_.c_str());
+      ret.value.i = std::stoi(buffer_);
     }
     else {
       //TODO error?
     }
   }
   else if(std::isdigit(lastch_)) {
+    int length = 1;
     cacheNextChar();
 
     while(std::isdigit(lastch_)) {
       cacheNextChar();
+
+      if(++length > LANGUST_MAX_INTEGER_LENGTH) {
+        throw std::runtime_error("Maximum integer length exceeded");
+      }
     }
 
     ret.type = Type::INT;
     ret.str = buffer_;
-    ret.value.i = atoi(buffer_.c_str());
+    ret.value.i = std::stoi(buffer_);
   }
 
   return ret;
