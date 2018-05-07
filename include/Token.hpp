@@ -43,7 +43,7 @@ enum EqOpType {
 };
 
 struct Token {
-  enum class Type {
+  enum Type {
     INT, IDN, BLN,
     FUN, RET,
     CUR_OP, CUR_CL,
@@ -59,6 +59,8 @@ struct Token {
     ASN,
     END_OF_SEQ,
     UNKNOWN
+
+    , N_TOKENS
   } type;
 
   std::string str;
@@ -101,6 +103,13 @@ struct Token {
   static Token Unknown() {
     return Token(Type::UNKNOWN);
   }
+
+  static const char* TypeToString(Type t) {
+    return name_map[t];
+  }
+
+private:
+  static const char* name_map[Type::N_TOKENS];
 };
 
 } //parse

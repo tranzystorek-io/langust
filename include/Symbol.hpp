@@ -28,6 +28,8 @@ enum SymbolId {
   AND_EXPR, AND_EXPR_A,
   OR_EXPR, OR_EXPR_A,
   EXPR, EXPR_A
+
+  , N_SYMBOLS
 };
 
 struct RuleAssoc {
@@ -53,20 +55,28 @@ struct Symbol {
   }
 
   Symbol(const RuleAssoc& ra)
-    : rule(ra) {
+    : type(Type::OK),
+      rule(ra) {
   }
 
   void setRule(SymbolId id, int index) {
     rule.setValue(id, index);
   }
 
+  bool isValid() const {
+    return type != Type::INVALID;
+  }
+
   static Symbol Invalid() {
     return Symbol();
   }
 
-  bool isValid() const {
-    return type != Type::INVALID;
+  static const char* IdToString(SymbolId id) {
+    return name_map[id];
   }
+
+private:
+  static const char* name_map[SymbolId::N_SYMBOLS];
 };
 
 } //parse

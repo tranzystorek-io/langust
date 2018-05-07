@@ -25,7 +25,11 @@ struct ProdSymbol {
     : type(t) {
   }
 
-  bool operator==(const ProdSymbol& other) {
+  bool isTerminal() const {
+    return type == Type::TERMINAL;
+  }
+
+  bool operator==(const ProdSymbol& other) const {
     if(type != other.type) {
       return false;
     }

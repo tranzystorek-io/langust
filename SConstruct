@@ -21,7 +21,7 @@ default_env = Environment(CPPPATH='#include', CXXFLAGS='-std=c++11',
 
 if debug_mode:
     debug_env = default_env.Clone()
-    debug_env.Append(CXXFLAGS=['-g', '-Og'])
+    debug_env.Append(CXXFLAGS=['-g', '-Og', '-D LANGUST_DEBUG'])
     debug_env['variant_dir'] += '/debug'
     debug_env['target_dir'] += '/debug'
 

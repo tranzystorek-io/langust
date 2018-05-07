@@ -2,7 +2,8 @@
 Import('env')
 
 sources = ['Input.cpp', 'Lexer.cpp', 'ParserTable.cpp',
-           'ProductionTable.cpp']
+           'Token.cpp', 'Symbol.cpp',
+           'ProductionTable.cpp', 'Parser.cpp']
 #objects = env.Object(sources)
 
 target = env.Program(target=env['target_dir'] + '/prog', source=['main.cpp'] + sources)
