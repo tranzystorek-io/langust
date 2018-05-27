@@ -78,6 +78,8 @@ struct Token {
     EqOpType eq_t;
   } value;
 
+  Token() = default;
+
   Token(Type type, const std::string& s = "")
     : type(type),
       str(s) {

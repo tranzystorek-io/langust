@@ -10,6 +10,12 @@ langust::parse::ParserTable::ParserTable() {
   initTable();
 }
 
+ParserTable& langust::parse::ParserTable::Instance() {
+  static ParserTable instance;
+
+  return instance;
+}
+
 Symbol ParserTable::getSymbol(SymbolId id, Token::Type t) const {
   try {
     const Row& row = table_.at(id);

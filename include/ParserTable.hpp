@@ -18,12 +18,14 @@ public:
   using TokenList = std::vector<Token::Type>;
 
 public:
-  ParserTable();
+  //ParserTable();
+  static ParserTable& Instance();
 
   Symbol getSymbol(SymbolId id, Token::Type t) const;
   TokenList getTokensForSymbol(SymbolId id) const;
 
 private:
+  ParserTable();
   void initTable();
 
 private:

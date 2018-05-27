@@ -6,6 +6,12 @@ ProductionTable::ProductionTable() {
   initTable();
 }
 
+ProductionTable& ProductionTable::Instance() {
+  static ProductionTable instance;
+
+  return instance;
+}
+
 const ProductionTable::Production& ProductionTable::getProduction(SymbolId id, int index) const {
   return table_.at(id).at(index);
 }

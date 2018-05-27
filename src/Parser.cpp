@@ -1,5 +1,8 @@
 #include "Parser.hpp"
 
+#include "ParserTable.hpp"
+#include "ProductionTable.hpp"
+
 #include <iostream>
 #include <algorithm>
 
@@ -33,6 +36,8 @@ void Parser::processSymbol(SymbolId sym) {
     if(t.isValid()) {
       if(ps.isTerminal()) {
         if(ps.value.tok == t.type) {
+          //add token to the parse tree and get next from lexer
+          treebuilder_.addNode(t);
           t = lexer_.getToken();
         }//if ps.value.tok == t.type
         else {
@@ -47,7 +52,8 @@ void Parser::processSymbol(SymbolId sym) {
         }
       }//if ps.isTerminal()
       else {
-        Symbol s = partable_.getSymbol(ps.value.sym, t.type);
+        Symbol s = ParserTable::Instance()
+          .getSymbol(ps.value.sym, t.type);
 
         if(!s.isValid()) {
           reportUnexpectedToken(t, ps);
@@ -65,7 +71,8 @@ void Parser::processSymbol(SymbolId sym) {
         // const Production& prod = prodtable_
         //   .getProduction(ps.value.sym, s.rule.index);
 
-        pushProduction(prodtable_
+        treebuilder_.addNode(ps.value.sym, s.rule.index);
+        pushProduction(ProductionTable::Instance()
                        .getProduction(ps.value.sym,
                                       s.rule.index));
       }//else
@@ -92,7 +99,7 @@ void Parser::pushProduction(const ProductionTable::Production& prod) {
 }
 
 void Parser::reportUnexpectedToken(const Token& t, ProdSymbol ps) const {
-  const ParserTable::TokenList& tlist = partable_
+  const ParserTable::TokenList& tlist = ParserTable::Instance()
     .getTokensForSymbol(ps.value.sym);
 
   //report Unexpected Token error
@@ -106,4 +113,8 @@ void Parser::reportUnexpectedToken(const Token& t, ProdSymbol ps) const {
   }
 
   std::cerr << "?" << std::endl;
+}
+
+ParseTreeBuilder& Parser::getTreeBuilder() {
+  return treebuilder_;
 }

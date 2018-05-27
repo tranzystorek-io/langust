@@ -65,11 +65,13 @@ public:
   using Table = std::unordered_map<SymbolId, ProdList>;
 
 public:
-  ProductionTable();
+  //ProductionTable();
+  static ProductionTable& Instance();
 
   const Production& getProduction(SymbolId id, int index) const;
 
 private:
+  ProductionTable();
   void initTable();
 
 private:

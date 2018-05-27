@@ -2,8 +2,8 @@
 #define PARSER_HPP
 
 #include "Lexer.hpp"
-#include "ParserTable.hpp"
 #include "ProductionTable.hpp"
+#include "parsetree/ParseTreeBuilder.hpp"
 
 #include <stack>
 
@@ -18,6 +18,7 @@ public:
   Parser(std::istream& in);
 
   void processSymbol(SymbolId sym);
+  ParseTreeBuilder& getTreeBuilder();
 
 private:
   void pushProduction(const ProductionTable::Production& prod);
@@ -25,8 +26,7 @@ private:
 
 private:
   Stack stack_;
-  ParserTable partable_;
-  ProductionTable prodtable_;
+  ParseTreeBuilder treebuilder_;
 
   Lexer lexer_;
 };

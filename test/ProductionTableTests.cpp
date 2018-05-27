@@ -13,9 +13,8 @@ TEST_CASE( "production table yields correct productions", "[production_table]" )
   using S = SymbolId;
   using T = Token::Type;
 
-  ProductionTable pt;
-
-  ProductionTable::Production prod = pt.getProduction(SymbolId::F_LIT_CONT, 0);
+  ProductionTable::Production prod = ProductionTable::Instance()
+    .getProduction(SymbolId::F_LIT_CONT, 0);
   ProductionTable::Production expected = {PS::NonTerminal(S::PARAM_LIST),
                                           PS::Terminal(T::RND_CL),
                                           PS::Terminal(T::CUR_OP),
@@ -26,8 +25,7 @@ TEST_CASE( "production table yields correct productions", "[production_table]" )
 }
 
 TEST_CASE( "production table throws out_of_range when index doesn't exist" ) {
-  ProductionTable pt;
-
-  REQUIRE_THROWS_AS( pt.getProduction(SymbolId::STMT, 1),
+  REQUIRE_THROWS_AS( ProductionTable::Instance()
+                     .getProduction(SymbolId::STMT, 1),
                      std::out_of_range );
 }
