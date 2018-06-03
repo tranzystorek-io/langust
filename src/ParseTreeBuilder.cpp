@@ -8,6 +8,18 @@ ParseTree&& ParseTreeBuilder::getGenerated() {
   return std::move(generated_);
 }
 
+bool ParseTreeBuilder::isReady() const {
+  return stack_.empty() /*&& (bool)(generated_.root)*/;
+}
+
+void langust::parse::ParseTreeBuilder::reset() {
+  generated_.reset();
+
+  while(!stack_.empty()) {
+    stack_.pop();
+  }
+}
+
 void ParseTreeBuilder::addNode(const Token& t) {
   if(stack_.empty()) {
   }
@@ -29,13 +41,23 @@ void ParseTreeBuilder::addNode(SymbolId id, int prod) {
   }
   else {
     unwindStack();
-    Node& node = *(stack_.top().ptr);
 
-    node.children.emplace_back(new Node(id, prod));
+    if(!stack_.empty()) {
+      Node& node = *(stack_.top().ptr);
 
-    stack_.emplace(node.children.back().get(),
-                   ProductionTable::Instance()
-                   .getProduction(id, prod).size());
+      node.children.emplace_back(new Node(id, prod));
+
+      stack_.emplace(node.children.back().get(),
+                     ProductionTable::Instance()
+                     .getProduction(id, prod).size());
+    }
+    else {
+      generated_.root.reset(new Node(id, prod));
+
+      stack_.emplace(generated_.root.get(),
+                     ProductionTable::Instance()
+                     .getProduction(id, prod).size());
+    }
   }
 }
 

@@ -34,7 +34,7 @@ struct NodeObject {
     , NONE
   } type;
 
-  std::unique_ptr<Node> object;
+  std::shared_ptr<Node> object;
 
   NodeObject()
     : type(Type::NONE) {
@@ -43,6 +43,10 @@ struct NodeObject {
   NodeObject(Node* ptr, Type t)
     : type(t),
       object(ptr) {
+  }
+
+  Node* getNode() const {
+    return object.get();
   }
 
   operator bool() const {

@@ -1,6 +1,8 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
 
+#include <functional>
+
 #include "Input.hpp"
 #include "Token.hpp"
 
@@ -17,13 +19,20 @@ namespace parse {
 
 class Lexer {
 public:
-  Lexer(std::istream& in = std::cin);
+  using Callback = std::function<void()>;
+
+public:
+  // Lexer(std::istream& in = std::cin, const Callback& callback = Callback());
+  Lexer(Input& input);
 
   Token getToken();
   Token currentToken() const;
 
+  void ignoreLine();
+
 private:
-  Input input_;
+  Input& input_;
+  Callback callback_;
 
   char lastch_;
   std::string buffer_;

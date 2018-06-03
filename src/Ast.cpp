@@ -35,7 +35,7 @@ std::string Ast::toString() const {
     }
   };
 
-  std::stack<NodeBox> bfs; bfs.emplace(root_.object.get(), root_.type);
+  std::stack<NodeBox> bfs; bfs.emplace(root_.getNode(), root_.type);
 
   while(!bfs.empty()) {
     NodeBox current = bfs.top(); bfs.pop();
@@ -47,8 +47,8 @@ std::string Ast::toString() const {
       {
         Assign* ptr = dynamic_cast<Assign*>(current.node);
 
-        bfs.emplace(ptr->rhs.object.get(), ptr->rhs.type);
-        bfs.emplace(ptr->lhs.object.get(), ptr->lhs.type);
+        bfs.emplace(ptr->rhs.getNode(), ptr->rhs.type);
+        bfs.emplace(ptr->lhs.getNode(), ptr->lhs.type);
       }
       break;
 
@@ -61,7 +61,7 @@ std::string Ast::toString() const {
         std::for_each(ptr->operands.rbegin(),
                       ptr->operands.rend(),
                       [&bfs](NodeObject& nobj) {
-                        bfs.emplace(nobj.object.get(), nobj.type);
+                        bfs.emplace(nobj.getNode(), nobj.type);
                       });
       }
       break;
@@ -75,7 +75,7 @@ std::string Ast::toString() const {
         std::for_each(ptr->operands.rbegin(),
                       ptr->operands.rend(),
                       [&bfs](NodeObject& nobj) {
-                        bfs.emplace(nobj.object.get(), nobj.type);
+                        bfs.emplace(nobj.getNode(), nobj.type);
                       });
       }
       break;
@@ -86,56 +86,116 @@ std::string Ast::toString() const {
       {
         Not* ptr = dynamic_cast<Not*>(current.node);
 
-        bfs.emplace(ptr->operand.object.get(), ptr->operand.type);
+        bfs.emplace(ptr->operand.getNode(), ptr->operand.type);
       }
       break;
 
     case NodeObject::EQ:
-      ret += "EQ( ";
+      ret += "EQ[";
       bfs.emplace(nullptr, NodeObject::NONE);
       {
         Eq* ptr = dynamic_cast<Eq*>(current.node);
 
-        bfs.emplace(ptr->right.object.get(), ptr->right.type);
-        bfs.emplace(ptr->left.object.get(), ptr->left.type);
+        switch(ptr->type) {
+        case Eq::EQU:
+          ret += "==]( ";
+          break;
+
+        case Eq::NEQ:
+          ret += "!=]( ";
+          break;
+        }
+
+        bfs.emplace(ptr->right.getNode(), ptr->right.type);
+        bfs.emplace(ptr->left.getNode(), ptr->left.type);
       }
       break;
 
     case NodeObject::REL:
-      ret += "REL( ";
+      ret += "REL[";
       bfs.emplace(nullptr, NodeObject::NONE);
       {
         Rel* ptr = dynamic_cast<Rel*>(current.node);
 
-        bfs.emplace(ptr->right.object.get(), ptr->right.type);
-        bfs.emplace(ptr->left.object.get(), ptr->left.type);
+        switch(ptr->type) {
+        case Rel::LT:
+          ret += "<]( ";
+          break;
+
+        case Rel::LE:
+          ret += "<=] ( ";
+          break;
+
+        case Rel::GT:
+          ret += ">]( ";
+          break;
+
+        case Rel::GE:
+          ret += ">=]( ";
+          break;
+        }
+
+        bfs.emplace(ptr->right.getNode(), ptr->right.type);
+        bfs.emplace(ptr->left.getNode(), ptr->left.type);
       }
       break;
 
     case NodeObject::ADD:
-      ret += "ADD( ";
+      ret += "ADD[ ";
       bfs.emplace(nullptr, NodeObject::NONE);
       {
         Add* ptr = dynamic_cast<Add*>(current.node);
 
+        for(auto op : ptr->operators) {
+          switch(op) {
+          case Add::ADD:
+            ret += "+ ";
+            break;
+
+          case Add::SUB:
+            ret += "- ";
+            break;
+          }
+        }
+
+        ret += "]( ";
+
         std::for_each(ptr->operands.rbegin(),
                       ptr->operands.rend(),
                       [&bfs](NodeObject& nobj) {
-                        bfs.emplace(nobj.object.get(), nobj.type);
+                        bfs.emplace(nobj.getNode(), nobj.type);
                       });
       }
       break;
 
     case NodeObject::MUL:
-      ret += "MUL( ";
+      ret += "MUL[ ";
       bfs.emplace(nullptr, NodeObject::NONE);
       {
         Mul* ptr = dynamic_cast<Mul*>(current.node);
 
+        for(auto op : ptr->operators) {
+          switch(op) {
+          case Mul::MUL:
+            ret += "* ";
+            break;
+
+          case Mul::DIV:
+            ret += "/ ";
+            break;
+
+          case Mul::MOD:
+            ret += "% ";
+            break;
+          }
+        }
+
+        ret += "]( ";
+
         std::for_each(ptr->operands.rbegin(),
                       ptr->operands.rend(),
                       [&bfs](NodeObject& nobj) {
-                        bfs.emplace(nobj.object.get(), nobj.type);
+                        bfs.emplace(nobj.getNode(), nobj.type);
                       });
       }
       break;
@@ -149,10 +209,10 @@ std::string Ast::toString() const {
         std::for_each(ptr->operands.rbegin(),
                       ptr->operands.rend(),
                       [&bfs](NodeObject& nobj) {
-                        bfs.emplace(nobj.object.get(), nobj.type);
+                        bfs.emplace(nobj.getNode(), nobj.type);
                       });
 
-        bfs.emplace(ptr->initial.object.get(), ptr->initial.type);
+        bfs.emplace(ptr->initial.getNode(), ptr->initial.type);
       }
       break;
 
@@ -189,7 +249,7 @@ std::string Ast::toString() const {
         std::for_each(ptr->exprs.rbegin(),
                       ptr->exprs.rend(),
                       [&bfs](NodeObject& nobj) {
-                        bfs.emplace(nobj.object.get(), nobj.type);
+                        bfs.emplace(nobj.getNode(), nobj.type);
                       });
       }
       break;
@@ -201,27 +261,30 @@ std::string Ast::toString() const {
         FuncLiteral* ptr = dynamic_cast<FuncLiteral*>(current.node);
 
         if(ptr->ret.object) {
-          bfs.emplace(ptr->ret.object.get(), ptr->ret.type);
+          bfs.emplace(ptr->ret.getNode(), ptr->ret.type);
         }
 
         std::for_each(ptr->ops.rbegin(),
                       ptr->ops.rend(),
                       [&bfs](NodeObject& nobj) {
-                        bfs.emplace(nobj.object.get(), nobj.type);
+                        bfs.emplace(nobj.getNode(), nobj.type);
                       });
       }
       break;
 
     case NodeObject::FAPPLY:
-      ret += "FAPPLY( ";
+      ret += "FAPPLY[";
       bfs.emplace(nullptr, NodeObject::NONE);
       {
         FuncApply* ptr = dynamic_cast<FuncApply*>(current.node);
 
+        ret += ptr->name;
+        ret += "]( ";
+
         std::for_each(ptr->exprs.rbegin(),
                       ptr->exprs.rend(),
                       [&bfs](NodeObject& nobj) {
-                        bfs.emplace(nobj.object.get(), nobj.type);
+                        bfs.emplace(nobj.getNode(), nobj.type);
                       });
       }
       break;

@@ -8,8 +8,25 @@
 
 using namespace langust::parse;
 
-Parser::Parser(std::istream& in)
-  : lexer_(in) {
+// Parser::Parser(std::istream& in, const Lexer::Callback& callback)
+//   : lexer_(in, callback) {
+// }
+
+Parser::Parser(Lexer& lexer)
+  : lexer_(lexer) {
+}
+
+void Parser::reset() {
+  lexer_.ignoreLine();
+  treebuilder_.reset();
+
+  while(!stack_.empty()) {
+    stack_.pop();
+  }
+}
+
+bool langust::parse::Parser::isReady() const {
+  return treebuilder_.isReady();
 }
 
 void Parser::processSymbol(SymbolId sym) {
@@ -37,7 +54,16 @@ void Parser::processSymbol(SymbolId sym) {
       if(ps.isTerminal()) {
         if(ps.value.tok == t.type) {
           //add token to the parse tree and get next from lexer
+
           treebuilder_.addNode(t);
+
+          //finish parsing on semicolon
+          if(stack_.empty() && t.type == Token::SCL) {
+            //TODO this works only for STMT
+            break;
+          }
+
+          //std::cout << "Getting new token from lexer..." << std::endl;
           t = lexer_.getToken();
         }//if ps.value.tok == t.type
         else {
@@ -48,6 +74,7 @@ void Parser::processSymbol(SymbolId sym) {
                     << "\" doesn't match any parser rule."
                     << std::endl;
 
+          reset();
           break;
         }
       }//if ps.isTerminal()
@@ -58,18 +85,16 @@ void Parser::processSymbol(SymbolId sym) {
         if(!s.isValid()) {
           reportUnexpectedToken(t, ps);
 
+          reset();
           break;
         }//if !s.isValid()
 
 #ifdef LANGUST_DEBUG
-        std::cerr << "token string: \"" << t.str
+        std::cout << "token string: \"" << t.str
                   << "\", rule: " << Symbol::IdToString(ps.value.sym)
                   << ", production: " << s.rule.index + 1
                   << std::endl;
 #endif //LANGUST_DEBUG
-
-        // const Production& prod = prodtable_
-        //   .getProduction(ps.value.sym, s.rule.index);
 
         treebuilder_.addNode(ps.value.sym, s.rule.index);
         pushProduction(ProductionTable::Instance()
@@ -85,6 +110,7 @@ void Parser::processSymbol(SymbolId sym) {
                 << t.str << "\""
                 << std::endl;
 
+      reset();
       break;
     }
   }//while

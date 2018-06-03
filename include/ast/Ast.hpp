@@ -4,6 +4,11 @@
 #include "ast/Node.hpp"
 
 namespace langust {
+
+namespace interpreter {
+  class Evaluator;
+}
+
 namespace parse {
 namespace ast {
 
@@ -17,6 +22,8 @@ public:
 
 private:
   NodeObject root_;
+
+  friend class interpreter::Evaluator;
 };
 
 } //ast

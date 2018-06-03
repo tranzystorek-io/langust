@@ -29,6 +29,9 @@ public:
   void addNode(const Token& t);
   void addNode(SymbolId id, int prod);
 
+  void reset();
+  bool isReady() const;
+
 private:
   void unwindStack();
 

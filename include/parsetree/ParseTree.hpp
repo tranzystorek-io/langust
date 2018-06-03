@@ -13,6 +13,7 @@ struct ParseTree {
   std::string toString() const;
 
   void walkWith(BaseListener* listener);
+  void reset();
 };
 
 } //parse

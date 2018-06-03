@@ -8,8 +8,17 @@ using namespace langust::parse;
 
 using Type = Token::Type;
 
-Lexer::Lexer(std::istream& in)
-  : input_(in),
+// Lexer::Lexer(std::istream& in, const Callback& callback)
+//   : input_(in),
+//     callback_(callback),
+//     lastch_(' '),
+//     pos_(1, -1),
+//     current_tok_(Token::Unknown()) {
+// }
+
+Lexer::Lexer(Input& input)
+  : input_(input),
+    //callback_(callback),
     lastch_(' '),
     pos_(1, -1),
     current_tok_(Token::Unknown()) {
@@ -19,6 +28,10 @@ void Lexer::processNextChar() {
   if(lastch_ == '\n') {
     pos_.col = 0;
     ++pos_.line;
+
+    //execute newline callback
+    if(callback_)
+      callback_();
   }
 
   else
@@ -59,6 +72,17 @@ Token Lexer::getToken() {
 
 Token Lexer::currentToken() const {
   return current_tok_;
+}
+
+void Lexer::ignoreLine() {
+  input_.ignore('\n');
+
+  lastch_ = '\n';
+  current_tok_ = Token::Unknown();
+  buffer_.clear();
+
+  ++pos_.line;
+  pos_.col = -1;
 }
 
 void Lexer::ignoreWhiteSpace() {

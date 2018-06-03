@@ -15,10 +15,14 @@ public:
   using Stack = std::stack<ProdSymbol>;
 
 public:
-  Parser(std::istream& in);
+  // Parser(std::istream& in, const Lexer::Callback& callback = Lexer::Callback());
+  Parser(Lexer& lexer);
 
   void processSymbol(SymbolId sym);
   ParseTreeBuilder& getTreeBuilder();
+
+  void reset();
+  bool isReady() const;
 
 private:
   void pushProduction(const ProductionTable::Production& prod);
@@ -28,7 +32,7 @@ private:
   Stack stack_;
   ParseTreeBuilder treebuilder_;
 
-  Lexer lexer_;
+  Lexer& lexer_;
 };
 
 }

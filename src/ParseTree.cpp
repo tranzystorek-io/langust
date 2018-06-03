@@ -73,3 +73,7 @@ void langust::parse::ParseTree::walkWith(BaseListener* listener) {
                   });
   }
 }
+
+void ParseTree::reset() {
+  root.reset();
+}
