@@ -1,0 +1,6 @@
+# ignore auxiliary tex files
+*.aux
+*.log
+*.pdf
+*.synctex.gz
+diagrams/*.dia
