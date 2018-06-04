@@ -78,7 +78,6 @@ Object Evaluator::eval(const parse::ast::Ast& tree) {
 
       case ast::NodeObject::LIST:
         evaluateList(stack, vstack);
-        stack.pop();
         break;
 
       case ast::NodeObject::LLIT:
@@ -509,23 +508,250 @@ void Evaluator::evaluateMul(const EvalStack& stack, ValueStack& vstack) {
   vstack.emplace(new Object(result));
 }
 
-void Evaluator::evaluateList(const EvalStack& stack, ValueStack& vstack) {
-  const AstEvalBox& box = stack.top();
+void Evaluator::evaluateList(EvalStack& stack, ValueStack& vstack) {
+  AstEvalBox& box = stack.top();
 
   parse::ast::List* listptr = dynamic_cast<parse::ast::List*>(box.node);
 
-  MemoryArena::Variable result = vstack.top(); vstack.pop();
+  MemoryArena::Variable result; //= vstack.top(); vstack.pop();
 
-  if(result->vtype != VarType::LIST) {
-    fallbackOnRuntimeError("List operation must have a List as first operand");
-  }
+  // if(result->vtype != VarType::LIST) {
+    // fallbackOnRuntimeError("List operation must have a List as first operand");
+  // }
 
-  for(auto op : listptr->operators) {
-    MemoryArena::Variable var = vstack.top(); vstack.pop();
+  parse::ast::List::Type op = listptr->operators[box.operationIndex];
+
+  //MemoryArena::Variable var = vstack.top(); vstack.pop();
 
     switch(op) {
+    case parse::ast::List::FLT:
+      {
+        MemoryArena::Variable modifiedElem;
+        MemoryArena::Variable fvar;
+
+        if(box.listIndex == 0) {
+          result = vstack.top(); vstack.pop();
+          fvar = vstack.top(); vstack.pop();
+
+          if(fvar->vtype != VarType::FUNC)
+            fallbackOnRuntimeError("Filter operator called on non-function object");
+        }
+        else {
+          if(box.funcApplied) {
+            arena_.exitFrame();
+            modifiedElem = vstack.top(); vstack.pop();
+            result = vstack.top(); vstack.pop();
+            fvar = vstack.top(); vstack.pop();
+          }
+          else {
+            result = vstack.top(); vstack.pop();
+            fvar = vstack.top(); vstack.pop();
+          }
+        }
+
+        if(result->vtype != VarType::LIST)
+          fallbackOnRuntimeError("List operation must have a List as first operand");
+
+        if(box.funcApplied) {
+          if(modifiedElem->vtype != VarType::BOOL)
+            fallbackOnRuntimeError("Filter operand function must return Boolean value");
+
+          parse::ast::FuncLiteral* fptr = dynamic_cast<parse::ast::FuncLiteral*>(fvar->func.get());
+
+          size_t size = fptr->ops.size();
+
+          //pop all function byproducts
+          for(size_t i=0; i<size;++i)
+            vstack.pop();
+
+          Object::List* newlist = new Object::List(result->list->begin(), result->list->end());
+
+          if(!modifiedElem->b) {
+            auto it = newlist->begin();
+            std::advance(it, box.listIndex - 1);
+
+            *it = Object();
+            it->i = -1;
+          }
+
+          if(box.listIndex >= newlist->size()) {
+            //collect all non-marked elements
+            newlist->remove_if([](const Object& obj) {
+                                 return obj.vtype == VarType::VOID && obj.i == -1;
+                               });
+
+            box.listIndex = 0;
+            ++box.operationIndex;
+
+            vstack.emplace(new Object(newlist));
+
+            if(box.operationIndex >= listptr->operators.size())
+              stack.pop();
+          }
+          else {
+            vstack.push(fvar);
+            vstack.emplace(new Object(newlist));
+          }
+
+          box.funcApplied = false;
+        }
+        else {
+          vstack.push(fvar);
+          vstack.push(result);
+
+          parse::ast::FuncLiteral* fptr = dynamic_cast<parse::ast::FuncLiteral*>(fvar->func.get());
+
+          if(fptr->params.size() != 1)
+            fallbackOnRuntimeError("Filter operand function must take exactly one argument");
+
+          if(result->list->size()) {
+
+            auto it = result->list->begin();
+            std::advance(it, box.listIndex);
+
+            //set copy of target list element as func param
+            arena_.enterFrame();
+            arena_.put(fptr->params.front(), MemoryArena::Variable(new Object(*it)));
+
+            if(fptr->ret)
+              stack.emplace(fptr->ret);
+
+            std::for_each(fptr->ops.rbegin(),
+                          fptr->ops.rend(),
+                          [&stack](const parse::ast::NodeObject& nobj) {
+                            stack.emplace(nobj);
+                          });
+
+            ++box.listIndex;
+            box.funcApplied = true;
+          }
+          else {
+            box.listIndex = 0;
+            ++box.operationIndex;
+
+            if(box.operationIndex >= listptr->operators.size()) {
+              stack.pop();
+            }
+          }
+        }
+      }
+      break;
+
+    case parse::ast::List::MAP:
+      {
+        //TODO MAP
+        MemoryArena::Variable modifiedElem;
+        MemoryArena::Variable fvar;
+
+        if(box.listIndex == 0) {
+          result = vstack.top(); vstack.pop();
+          fvar = vstack.top(); vstack.pop();
+
+          if(fvar->vtype != VarType::FUNC)
+            fallbackOnRuntimeError("Filter operator called on non-function object");
+        }
+        else {
+          if(box.funcApplied) {
+            arena_.exitFrame();
+            modifiedElem = vstack.top(); vstack.pop();
+            result = vstack.top(); vstack.pop();
+            fvar = vstack.top(); vstack.pop();
+          }
+          else {
+            result = vstack.top(); vstack.pop();
+            fvar = vstack.top(); vstack.pop();
+          }
+        }
+
+        if(result->vtype != VarType::LIST)
+          fallbackOnRuntimeError("List operation must have a List as first operand");
+
+        if(box.funcApplied) {
+          parse::ast::FuncLiteral* fptr = dynamic_cast<parse::ast::FuncLiteral*>(fvar->func.get());
+
+          size_t size = fptr->ops.size();
+
+          //pop all function byproducts
+          for(size_t i=0; i<size;++i)
+            vstack.pop();
+
+          Object::List* newlist = new Object::List(result->list->begin(), result->list->end());
+
+          // if(!modifiedElem->b) {
+          //   auto it = newlist->begin();
+          //   std::advance(it, box.listIndex - 1);
+
+          //   *it = Object();
+          //   it->i = -1;
+          // }
+
+          auto it = newlist->begin();
+          std::advance(it, box.listIndex - 1);
+          *it = *modifiedElem;
+
+          if(box.listIndex >= newlist->size()) {
+            box.listIndex = 0;
+            ++box.operationIndex;
+
+            vstack.emplace(new Object(newlist));
+
+            if(box.operationIndex >= listptr->operators.size())
+              stack.pop();
+          }
+          else {
+            vstack.push(fvar);
+            vstack.emplace(new Object(newlist));
+          }
+
+          box.funcApplied = false;
+        }
+        else {
+          vstack.push(fvar);
+          vstack.push(result);
+
+          parse::ast::FuncLiteral* fptr = dynamic_cast<parse::ast::FuncLiteral*>(fvar->func.get());
+
+          if(fptr->params.size() != 1)
+            fallbackOnRuntimeError("Filter operand function must take exactly one argument");
+
+          if(result->list->size()) {
+
+            auto it = result->list->begin();
+            std::advance(it, box.listIndex);
+
+            //set copy of target list element as func param
+            arena_.enterFrame();
+            arena_.put(fptr->params.front(), MemoryArena::Variable(new Object(*it)));
+
+            if(fptr->ret)
+              stack.emplace(fptr->ret);
+
+            std::for_each(fptr->ops.rbegin(),
+                          fptr->ops.rend(),
+                          [&stack](const parse::ast::NodeObject& nobj) {
+                            stack.emplace(nobj);
+                          });
+
+            ++box.listIndex;
+            box.funcApplied = true;
+          }
+          else {
+            box.listIndex = 0;
+            ++box.operationIndex;
+
+            if(box.operationIndex >= listptr->operators.size()) {
+              stack.pop();
+            }
+          }
+        }
+      }
+      break;
+
     case parse::ast::List::ACCESS_ONE:
       {
+        result = vstack.top(); vstack.pop();
+        MemoryArena::Variable var = vstack.top(); vstack.pop();
+
         if(var->vtype != VarType::INT) {
           fallbackOnRuntimeError("List access operand must be an Integer");
         }
@@ -545,11 +771,19 @@ void Evaluator::evaluateList(const EvalStack& stack, ValueStack& vstack) {
         newlist->assign(it, itend);
 
         result = MemoryArena::Variable(new Object(newlist));
+        ++box.operationIndex;
+        vstack.push(result);
+
+        if(box.operationIndex >= listptr->operators.size())
+          stack.pop();
       }
       break;
 
     case parse::ast::List::ACCESS_FROM:
       {
+        result = vstack.top(); vstack.pop();
+        MemoryArena::Variable var = vstack.top(); vstack.pop();
+
         if(var->vtype != VarType::INT) {
           fallbackOnRuntimeError("List access operand must be an Integer");
         }
@@ -567,11 +801,19 @@ void Evaluator::evaluateList(const EvalStack& stack, ValueStack& vstack) {
         newlist->assign(it, result->list->end());
 
         result = MemoryArena::Variable(new Object(newlist));
+        ++box.operationIndex;
+        vstack.push(result);
+
+        if(box.operationIndex >= listptr->operators.size())
+          stack.pop();
       }
       break;
 
     case parse::ast::List::ACCESS_TO:
       {
+        result = vstack.top(); vstack.pop();
+        MemoryArena::Variable var = vstack.top(); vstack.pop();
+
         if(var->vtype != VarType::INT) {
           fallbackOnRuntimeError("List access operand must be an Integer");
         }
@@ -589,11 +831,18 @@ void Evaluator::evaluateList(const EvalStack& stack, ValueStack& vstack) {
         newlist->assign(result->list->begin(), it);
 
         result = MemoryArena::Variable(new Object(newlist));
+        ++box.operationIndex;
+        vstack.push(result);
+
+        if(box.operationIndex >= listptr->operators.size())
+          stack.pop();
       }
       break;
 
     case parse::ast::List::ACCESS_RANGE:
       {
+        result = vstack.top(); vstack.pop();
+        MemoryArena::Variable var = vstack.top(); vstack.pop();
         MemoryArena::Variable range_end = vstack.top(); vstack.pop();
 
         if(var->vtype != VarType::INT || range_end->vtype != VarType::INT) {
@@ -622,12 +871,19 @@ void Evaluator::evaluateList(const EvalStack& stack, ValueStack& vstack) {
         newlist->assign(itbeg, itend);
 
         result = MemoryArena::Variable(new Object(newlist));
+        ++box.operationIndex;
+        vstack.push(result);
+
+        if(box.operationIndex >= listptr->operators.size())
+          stack.pop();
       }
       break;
     }
-  }
 
-  vstack.push(result);
+  // if(box.operationIndex >= listptr->operators.size())
+  //   stack.pop();
+
+  // vstack.push(result);
 }
 
 void Evaluator::evaluateId(const EvalStack& stack, ValueStack& vstack) {

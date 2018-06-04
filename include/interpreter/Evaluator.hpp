@@ -19,12 +19,17 @@ struct AstEvalBox {
   bool evaluateNow;
   bool funcApplied;
 
+  size_t operationIndex;
+  size_t listIndex;
+
   AstEvalBox(const parse::ast::NodeObject& nobject)
     : type(nobject.type),
       node(nobject.getNode()),
       funcptr(nullptr),
       evaluateNow(false),
-      funcApplied(false) {
+      funcApplied(false),
+      operationIndex(0),
+      listIndex(0) {
     if(type == parse::ast::NodeObject::FLIT)
       funcptr = &(nobject.object);
   }
@@ -47,7 +52,7 @@ private:
   void evaluateRel(const EvalStack& stack, ValueStack& vstack);
   void evaluateAdd(const EvalStack& stack, ValueStack& vstack);
   void evaluateMul(const EvalStack& stack, ValueStack& vstack);
-  void evaluateList(const EvalStack& stack, ValueStack& vstack);
+  void evaluateList(EvalStack& stack, ValueStack& vstack);
   void evaluateId(const EvalStack& stack, ValueStack& vstack);
   void evaluateListLiteral(const EvalStack& stack, ValueStack& vstack);
   void evaluateFuncApply(EvalStack& stack, ValueStack& vstack);

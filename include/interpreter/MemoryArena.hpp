@@ -35,7 +35,8 @@ struct Object {
   FuncPtr func;
 
   Object()
-    : vtype(VarType::VOID) {
+    : vtype(VarType::VOID),
+      i(0) {
   }
 
   explicit Object(int intval)

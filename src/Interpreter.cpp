@@ -61,14 +61,19 @@ void printObject(const Object& obj) {
 
   case VarType::LIST:
     std::cout << "[ ";
+    {
+      const size_t lastIndex = obj.list->size() - 1;
+      size_t i=0;
 
-    for(auto& lobj : *(obj.list)) {
-      printObject(lobj);
-      std::cout << ", ";
+      for(auto& lobj : *(obj.list)) {
+        printObject(lobj);
+        if(i++ == lastIndex)
+          std::cout << " ";
+        else
+          std::cout << ", ";
+      }
     }
-
     std::cout << "]";
-
     break;
 
   case VarType::FUNC:
@@ -108,22 +113,22 @@ void Interpreter::execute() {
       parsing_ = true;
 
       parser_.processSymbol(parse::SymbolId::STMT);
-      parse::ParseTree ptree = parser_.getTreeBuilder().getGenerated();
-      ptree.walkWith(&astGenerator_);
+        parse::ParseTree ptree = parser_.getTreeBuilder().getGenerated();
+        ptree.walkWith(&astGenerator_);
 
-      parse::ast::Ast ast = astGenerator_.getAst();
-      // std::cout << ast.toString() << std::endl;
-      last = ast.toString();
-      try {
-        lastObj = evaluator_.eval(ast);
-        evaluationCorrect = true;
+        parse::ast::Ast ast = astGenerator_.getAst();
+        // std::cout << ast.toString() << std::endl;
+        // last = ast.toString();
+        try {
+          lastObj = evaluator_.eval(ast);
+          evaluationCorrect = true;
+        }
+        catch(const RuntimeEvaluationException& ex) {
+          std::cout << ex.what() << std::endl;
+        }
       }
-      catch(const RuntimeEvaluationException& ex) {
-        std::cout << ex.what() << std::endl;
-      }
-    }
 
-    std::cout << last << std::endl;
+    // std::cout << last << std::endl;
 
     if(evaluationCorrect) {
       printObject(lastObj);
