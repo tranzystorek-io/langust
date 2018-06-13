@@ -1,6 +1,8 @@
 #include "Lexer.hpp"
 #include "catch.hpp"
 
+#include "Input.hpp"
+
 #include <sstream>
 
 using namespace langust::parse;
@@ -9,8 +11,9 @@ TEST_CASE( "tokens are scanned", "[lexer]" ) {
   using TokType = langust::parse::Token::Type;
 
   std::istringstream iss;
+  Input input(iss);
   Token t = Token::Unknown();
-  Lexer lexer(iss);
+  Lexer lexer(input);
 
   SECTION( "identifiers" ) {
     iss.str("a a1 a_ _ _a _1 _a_ _1_ 1a");
@@ -416,7 +419,8 @@ TEST_CASE( "exception is thrown when identifier too long", "[lexer]" ) {
   std::string s(LANGUST_MAX_IDENTIFIER_LENGTH + 1, 'a');
   std::istringstream iss(s);
 
-  Lexer lexer(iss);
+  Input input(iss);
+  Lexer lexer(input);
 
   REQUIRE_THROWS_AS( lexer.getToken(), std::runtime_error );
 }
@@ -425,7 +429,8 @@ TEST_CASE( "exception is thrown when integer too long", "[lexer]" ) {
   std::string s(LANGUST_MAX_INTEGER_LENGTH + 1, '1');
   std::istringstream iss(s);
 
-  Lexer lexer(iss);
+  Input input(iss);
+  Lexer lexer(input);
 
   REQUIRE_THROWS_AS( lexer.getToken(), std::runtime_error );
 }
@@ -434,7 +439,8 @@ TEST_CASE( "file position is tracked", "[lexer]" ) {
   std::istringstream iss("ab 12\n"
                          "ef >:");
 
-  Lexer lexer(iss);
+  Input input(iss);
+  Lexer lexer(input);
   Token t = Token::Unknown();
 
   t = lexer.getToken();

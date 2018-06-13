@@ -1,7 +1,7 @@
 Import('env')
 
-sources = ['InputTests.cpp', 'LexerTests.cpp', 'ParserTableTests.cpp',
-           'ProductionTableTests.cpp']
+sources = ['InputTests.cpp', 'LexerTests.cpp',
+           'ParserTableTests.cpp', 'ProductionTableTests.cpp']
 
 target = env.Program(target=env['target_dir'] + '/test',
                      source=['tests_main.cpp'] + sources + Glob(env['variant_dir'] + '/*.o',
