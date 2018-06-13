@@ -15,7 +15,7 @@ if not debug_mode and not release_mode:
     release_mode = True
 
 envs = {}
-default_env = Environment(CPPPATH='#include', CXXFLAGS='-std=c++11',
+default_env = Environment(CPPPATH=['#include', '#3rdparty'], CXXFLAGS='-std=c++11',
                           variant_dir='#/build',
                           target_dir='#/bin')
 
