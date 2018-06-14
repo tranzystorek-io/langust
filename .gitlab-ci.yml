@@ -5,7 +5,7 @@ build_program:
         - scons --rel
     artifacts:
         paths:
-            - bin/release/prog
+            - bin/release/langust
     only:
         - master
 
