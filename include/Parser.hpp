@@ -18,7 +18,7 @@ public:
   // Parser(std::istream& in, const Lexer::Callback& callback = Lexer::Callback());
   Parser(Lexer& lexer);
 
-  void processSymbol(SymbolId sym);
+  bool processSymbol(SymbolId sym);
   ParseTreeBuilder& getTreeBuilder();
 
   void reset();

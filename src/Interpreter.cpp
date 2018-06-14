@@ -112,7 +112,9 @@ void Interpreter::execute() {
     while(!newLine_) {
       parsing_ = true;
 
-      parser_.processSymbol(parse::SymbolId::STMT);
+      bool parseSuccess = parser_.processSymbol(parse::SymbolId::STMT);
+
+      if(parseSuccess) {
         parse::ParseTree ptree = parser_.getTreeBuilder().getGenerated();
         ptree.walkWith(&astGenerator_);
 
@@ -127,8 +129,7 @@ void Interpreter::execute() {
           std::cout << ex.what() << std::endl;
         }
       }
-
-    // std::cout << last << std::endl;
+    }//while
 
     if(evaluationCorrect) {
       printObject(lastObj);

@@ -29,9 +29,7 @@ bool langust::parse::Parser::isReady() const {
   return treebuilder_.isReady();
 }
 
-void Parser::processSymbol(SymbolId sym) {
-  using Production = ProductionTable::Production;
-
+bool Parser::processSymbol(SymbolId sym) {
   stack_.push(ProdSymbol::NonTerminal(sym));
   Token t = lexer_.getToken();
 
@@ -54,7 +52,6 @@ void Parser::processSymbol(SymbolId sym) {
       if(ps.isTerminal()) {
         if(ps.value.tok == t.type) {
           //add token to the parse tree and get next from lexer
-
           treebuilder_.addNode(t);
 
           //finish parsing on semicolon
@@ -63,11 +60,9 @@ void Parser::processSymbol(SymbolId sym) {
             break;
           }
 
-          //std::cout << "Getting new token from lexer..." << std::endl;
           t = lexer_.getToken();
         }//if ps.value.tok == t.type
         else {
-          //TODO error
           std::cerr << "line: " << t.pos.line
                     << " col: " << t.pos.col
                     << "\nError: symbol \"" << t.str
@@ -75,7 +70,7 @@ void Parser::processSymbol(SymbolId sym) {
                     << std::endl;
 
           reset();
-          break;
+          return false;
         }
       }//if ps.isTerminal()
       else {
@@ -86,7 +81,7 @@ void Parser::processSymbol(SymbolId sym) {
           reportUnexpectedToken(t, ps);
 
           reset();
-          break;
+          return false;
         }//if !s.isValid()
 
 #ifdef LANGUST_DEBUG
@@ -111,9 +106,11 @@ void Parser::processSymbol(SymbolId sym) {
                 << std::endl;
 
       reset();
-      break;
+      return false;
     }
   }//while
+
+  return true;
 }//processSymbol
 
 void Parser::pushProduction(const ProductionTable::Production& prod) {
