@@ -9,18 +9,14 @@ A list-processing language for the
 
 ### Prerequisites
 
-* *SCons*
+* cmake
 
 ### Build
 
-* ``scons``
-
-### Clean
-
-* ``scons -c``
+* ``
 
 ### Run
 
-* ``bin/release/langust``
+* ``
 * Type in commands
 * To exit, send *EOF* (Ctrl+D on *nix)

@@ -1,0 +1,16 @@
+add_library(langust
+        SHARED
+        src/Ast.cpp
+        src/Evaluator.cpp
+        src/ExpressionListener.cpp
+        src/Input.cpp
+        src/Interpreter.cpp
+        src/Lexer.cpp
+        src/MemoryArena.cpp
+        src/Parser.cpp
+        src/ParserTable.cpp
+        src/ParseTree.cpp
+        src/ParseTreeBuilder.cpp
+        src/ProductionTable.cpp
+        src/Symbol.cpp
+        src/Token.cpp)

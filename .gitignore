@@ -3,9 +3,5 @@
 # doxygen output
 docs/doxy
 
-# scons files
-.sconsign.dblite
-
-# project dirs
-build/
-bin/
+cmake-build-*
+.idea/
