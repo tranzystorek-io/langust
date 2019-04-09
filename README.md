@@ -13,10 +13,12 @@ A list-processing language for the
 
 ### Build
 
-* ``
+* `mkdir build && cd build`
+* `cmake ..`
+* `make`
 
 ### Run
 
-* ``
+* Path to executable is `<build-dir>/repl/replangust`
 * Type in commands
 * To exit, send *EOF* (Ctrl+D on *nix)
